@@ -17,6 +17,7 @@ import Subcontractors from "./pages/Subcontractors.jsx";
 import AccountsDashboard from "./pages/AccountsDashboard.jsx";
 import PurchaseModule from "./pages/PurchaseModule.jsx";
 import InventoryView from "./pages/InventoryView.jsx";
+import ProjectSetup from "./pages/ProjectSetup.jsx";
 import { exportRABillPDF, exportDPRReportPDF } from "./utils/pdfExport.js";
 
 const G="#2E6B2E",GD="#1A3F1A",GL="#EBF5EB";
@@ -30,7 +31,7 @@ const NAV_ITEMS={
   engineer: ["home","dpr"],
   accounts: ["home","bills","boq","subcon","accounts","purchase","inventory"],
 };
-const PAGES_NO_SOON=["home","dpr","bills","boq","subcon","accounts","purchase","inventory"];
+const PAGES_NO_SOON=["home","dpr","bills","boq","subcon","accounts","purchase","inventory","settings"];
 const ALL_PAGES=[
   {id:"home",    label:"Dashboard",      Icon:LayoutDashboard, roles:["admin","engineer","accounts"]},
   {id:"dpr",     label:"DPR Entry",      Icon:ClipboardList,   roles:["admin","engineer"]},
@@ -40,7 +41,7 @@ const ALL_PAGES=[
   {id:"accounts",label:"Accounts",       Icon:IndianRupee,     roles:["admin","accounts"]},
   {id:"purchase",label:"Purchase",       Icon:Package,         roles:["admin","accounts"]},
   {id:"inventory",label:"Inventory",     Icon:Boxes,           roles:["admin","accounts"]},
-  {id:"settings",label:"Settings",       Icon:Settings,        roles:["admin"],soon:true},
+  {id:"settings",label:"Project Setup",  Icon:Settings,        roles:["admin"]},
 ];
 
 const StatusBadge=({status})=>{const m={Paid:{bg:"#EBF5EB",color:G,dot:G},Certified:{bg:"#E3F2FD",color:"#1565C0",dot:"#1565C0"},Submitted:{bg:"#FFF8E1",color:"#F57F17",dot:"#F57F17"}};const s=m[status]||{bg:"#F5F5F5",color:"#666",dot:"#666"};return <span style={{background:s.bg,color:s.color,padding:"2px 10px",borderRadius:20,fontSize:12,fontWeight:500,display:"inline-flex",alignItems:"center",gap:5}}><span style={{width:6,height:6,borderRadius:"50%",background:s.dot}}/>{status}</span>};
@@ -49,7 +50,7 @@ const KPICard=({label,value,sub,accent=G})=>(<div style={{background:"var(--colo
 
 const EGLogo=({c})=>(<div style={{display:"flex",alignItems:"center",gap:c?0:10}}><svg width="38" height="34" viewBox="0 0 38 34" fill="none"><rect width="18" height="34" rx="3" fill="#1A1A1A"/><rect x="18" width="20" height="34" rx="3" fill={G}/><text x="3" y="26" fill="white" fontSize="20" fontWeight="700" fontFamily="sans-serif">E</text><text x="20" y="26" fill="white" fontSize="20" fontWeight="700" fontFamily="sans-serif">G</text><ellipse cx="29" cy="8" rx="8" ry="4" fill="#1A1A1A" opacity=".7"/><rect x="23" y="10" width="12" height="2" rx="1" fill="#1A1A1A" opacity=".5"/></svg>{!c&&<div><p style={{margin:0,color:"white",fontWeight:600,fontSize:13}}>Evergreen</p><p style={{margin:0,color:"rgba(255,255,255,.5)",fontSize:11}}>Enterprises</p></div>}</div>);
 
-function Sidebar({page,setPage,user,project,setProject,collapsed,setCollapsed,onLogout}){
+function Sidebar({page,setPage,user,project,setProject,projects,collapsed,setCollapsed,onLogout}){
   const [pick,setPick]=useState(false);
   const vis=ALL_PAGES.filter(p=>(NAV_ITEMS[user.role]||[]).includes(p.id));
   return <div style={{width:collapsed?60:220,background:GD,display:"flex",flexDirection:"column",flexShrink:0,transition:"width .2s",overflow:"hidden"}}>
@@ -62,7 +63,7 @@ function Sidebar({page,setPage,user,project,setProject,collapsed,setCollapsed,on
       </button>
       {pick&&<div style={{position:"absolute",top:"calc(100% - 4px)",left:8,right:8,background:"white",borderRadius:8,border:"0.5px solid rgba(0,0,0,.1)",zIndex:50,overflow:"hidden",boxShadow:"0 8px 24px rgba(0,0,0,.15)"}}>
         <p style={{margin:0,padding:"8px 12px",fontSize:10,fontWeight:600,color:"#888",textTransform:"uppercase",letterSpacing:".06em",borderBottom:"0.5px solid rgba(0,0,0,.08)"}}>Switch project</p>
-        {PROJECTS.filter(p=>user.projects.includes(p.id)).map(p=><button key={p.id} onClick={()=>{setProject(p);setPick(false)}} style={{width:"100%",background:project.id===p.id?GL:"transparent",border:"none",padding:"10px 12px",cursor:"pointer",textAlign:"left",borderBottom:"0.5px solid rgba(0,0,0,.06)"}}><p style={{margin:0,fontSize:12,fontWeight:500,color:project.id===p.id?G:"#1A1A1A"}}>{p.id}</p><p style={{margin:0,fontSize:11,color:"#888"}}>{p.siteName||p.name}</p></button>)}
+        {projects.filter(p=>user.projects.includes(p.id)).map(p=><button key={p.id} onClick={()=>{setProject(p);setPick(false)}} style={{width:"100%",background:project.id===p.id?GL:"transparent",border:"none",padding:"10px 12px",cursor:"pointer",textAlign:"left",borderBottom:"0.5px solid rgba(0,0,0,.06)"}}><p style={{margin:0,fontSize:12,fontWeight:500,color:project.id===p.id?G:"#1A1A1A"}}>{p.id}</p><p style={{margin:0,fontSize:11,color:"#888"}}>{p.siteName||p.name}</p></button>)}
       </div>}
     </div>
     <nav style={{flex:1,padding:"8px",display:"flex",flexDirection:"column",gap:2}}>
@@ -78,7 +79,7 @@ function Sidebar({page,setPage,user,project,setProject,collapsed,setCollapsed,on
 }
 
 function Header({page,user,project}){
-  const t={home:"Dashboard",dpr:"DPR Entry",bills:"RA Bills",boq:"BOQ Manager",subcon:"Sub-contractors",settings:"Settings"};
+  const t={home:"Dashboard",dpr:"DPR Entry",bills:"RA Bills",boq:"BOQ Manager",subcon:"Sub-contractors",accounts:"Accounts",purchase:"Purchase",inventory:"Inventory",settings:"Project Setup"};
   return <div style={{height:54,background:"var(--color-background-primary)",borderBottom:"0.5px solid var(--color-border-tertiary)",display:"flex",alignItems:"center",padding:"0 20px",gap:12,flexShrink:0}}>
     <div style={{flex:1}}><p style={{margin:0,fontSize:13,fontWeight:500,color:"var(--color-text-primary)"}}>{t[page]||page}</p><p style={{margin:0,fontSize:11,color:"var(--color-text-tertiary)"}}>{project.name}</p></div>
     <div style={{display:"flex",alignItems:"center",gap:6,padding:"5px 10px",borderRadius:6,border:"0.5px solid var(--color-border-secondary)",background:"var(--color-background-secondary)"}}><ShieldCheck size={13} color={user.color}/><span style={{fontSize:12,fontWeight:500,color:user.color}}>{user.roleLabel}</span></div>
@@ -126,6 +127,7 @@ export default function App(){
   const {user,login,logout,isAuthenticated}=useAuth();
   const [page,setPage]=useState("home");
   const [project,setProject]=useState(PROJECTS[0]);
+  const [projects,setProjects]=useState(PROJECTS);
   const [collapsed,setCollapsed]=useState(false);
   // dprs: new entries added by the site team via DPR Entry page
   // bills: seeded with real historical RA Bills; new bills appended on submit
@@ -149,7 +151,7 @@ export default function App(){
   if(safe!==page) setPage(safe);
 
   return <div style={{display:"flex",height:"100vh",overflow:"hidden",background:"var(--color-background-tertiary)",fontFamily:"var(--font-sans)"}}>
-    <Sidebar page={page} setPage={setPage} user={user} project={project} setProject={setProject} collapsed={collapsed} setCollapsed={setCollapsed} onLogout={logout}/>
+    <Sidebar page={page} setPage={setPage} user={user} project={project} setProject={setProject} projects={projects} collapsed={collapsed} setCollapsed={setCollapsed} onLogout={logout}/>
     <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}}>
       <Header page={page} user={user} project={project}/>
       <div style={{flex:1,overflowY:"auto"}}>
@@ -161,6 +163,7 @@ export default function App(){
         {page==="accounts"&&<AccountsDashboard project={project} user={user}/>}
         {page==="purchase"&&<PurchaseModule project={project} user={user}/>}
         {page==="inventory"&&<InventoryView project={project} user={user}/>}
+        {page==="settings"&&<ProjectSetup projects={projects} setProjects={p=>{setProjects(p);}} onProjectSelect={p=>{setProject(p);setPage("home");}}/>}
         {!PAGES_NO_SOON.includes(page)&&<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:300,color:"var(--color-text-tertiary)"}}><Layers size={32} style={{marginBottom:8,opacity:.3}}/><p style={{fontSize:14,margin:0}}>Coming soon</p></div>}
       </div>
     </div>
