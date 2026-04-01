@@ -1,0 +1,43 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_SHEETS_PROXY_URL:     ${{ secrets.VITE_SHEETS_PROXY_URL }}
+          VITE_SHEETS_PROXY_SECRET:  ${{ secrets.VITE_SHEETS_PROXY_SECRET }}
+          VITE_SHEET_ERP:            ${{ secrets.VITE_SHEET_ERP }}
+          VITE_SHEET_SECRETS:        ${{ secrets.VITE_SHEET_SECRETS }}
+          VITE_SHEET_EMPLOYEES:      ${{ secrets.VITE_SHEET_EMPLOYEES }}
+          VITE_SHEET_ACCOUNTS:       ${{ secrets.VITE_SHEET_ACCOUNTS }}
+          VITE_SHEET_MASTER:         ${{ secrets.VITE_SHEET_MASTER }}
+          VITE_SHEET_PURCHASE:       ${{ secrets.VITE_SHEET_PURCHASE }}
+          VITE_SHEET_STORES:         ${{ secrets.VITE_SHEET_STORES }}
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
