@@ -40,12 +40,15 @@ export const PROJECTS = [
 ];
 
 export const BOQ_ITEMS = [
-  { code: "1000.1", wbs: "CI-2337-1-01-01-0001", desc: "Field Permeability Test (RBM)", unit: "Nos",  woQty: 35,      rate: 2000, billedQty: 0 },
-  { code: "1000.2", wbs: "CI-2337-1-01-01-0002", desc: "Drilling 100mm dia, Odex Method, upto 15m",     unit: "RMT",  woQty: 6485,    rate: 2700, billedQty: 6900 },
-  { code: "1000.3", wbs: "CI-2337-1-01-01-0003", desc: "Drilling 76mm, Hard Rock Rotary, upto 15m",     unit: "RMT",  woQty: 59,      rate: 3300, billedQty: 0 },
-  { code: "1000.4", wbs: "CI-2337-1-01-01-0004", desc: "Grouting – Silica Grout Material (incl. Mat.)", unit: "Kg",   woQty: 1023000, rate: 7,    billedQty: 0 },
-  { code: "1000.5", wbs: "CI-2337-1-01-01-0005", desc: "Grouting – Cement Grout Material (TAM)",        unit: "Kg",   woQty: 3410000, rate: 6,    billedQty: 1629934 },
-  { code: "1000.6", wbs: "CI-2337-1-01-01-0006", desc: "Water Permeability Test – Rock Bed",            unit: "Nos",  woQty: 5,       rate: 1500, billedQty: 0 },
+  { code: "1000.1", wbs: "CI-2337-1-01-01-0001", desc: "Field Permeability Test (RBM)",                          unit: "Nos",  woQty: 35,      rate: 2000, billedQty: 0       },
+  { code: "1000.2", wbs: "CI-2337-1-01-01-0002", desc: "Drilling 100mm dia, Odex Method, upto 15m",             unit: "RMT",  woQty: 6485,    rate: 2700, billedQty: 6900    },
+  { code: "1000.3", wbs: "CI-2337-1-01-01-0003", desc: "Drilling 76mm, Hard Rock Rotary, upto 15m",             unit: "RMT",  woQty: 59,      rate: 3300, billedQty: 0       },
+  { code: "1000.4", wbs: "CI-2337-1-01-01-0004", desc: "Grouting – Silica Grout Material (incl. Mat.)",         unit: "Kg",   woQty: 1023000, rate: 7,    billedQty: 0       },
+  { code: "1000.5", wbs: "CI-2337-1-01-01-0005", desc: "Grouting – Cement Grout Material (TAM)",                unit: "Kg",   woQty: 3410000, rate: 6,    billedQty: 1616412 },
+  { code: "1000.6", wbs: "CI-2337-1-01-01-0006", desc: "Water Permeability Test – Rock Bed",                    unit: "Nos",  woQty: 5,       rate: 1500, billedQty: 0       },
+  // billedQty sourced from RA Bills 01–05 (Client Bills), extracted Apr-2026
+  // 1000.2: 345+1380+600+1785+2790 = 6,900 RMT (drilling metres per hole measurement sheets)
+  // 1000.5: TAM + Sheath cement = 101,331+344,606+105,000+313,500+751,975 = 1,616,412 kg
 ];
 
 export const SUBCONTRACTORS = [
