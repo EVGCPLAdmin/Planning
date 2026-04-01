@@ -48,7 +48,9 @@ const cardStyle={background:"var(--color-background-primary)",border:"0.5px soli
 const inp={padding:"7px 10px",borderRadius:6,border:"0.5px solid var(--color-border-secondary)",background:"var(--color-background-primary)",fontSize:12,fontFamily:"inherit",color:"var(--color-text-primary)"};
 
 
-export default function AccountsDashboard({ user }) {
+export default function AccountsDashboard({ project, user }) {
+  const siteName = project?.siteName || project?.site || "";
+
   const [payments, setPayments] = useState([]);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState("");
@@ -78,7 +80,7 @@ export default function AccountsDashboard({ user }) {
     setLoading(true); setError("");
     try {
       const { fetchPaymentRequests } = await import("../utils/sheetsClient");
-      const rows = await fetchPaymentRequests({ limit: 1000 });
+      const rows = await fetchPaymentRequests({ site: siteName, limit: 1000, bustCache: true });
       setPayments(rows);
       setLastRefresh(new Date());
     } catch(e) {
@@ -88,7 +90,7 @@ export default function AccountsDashboard({ user }) {
     }
   }
 
-  useEffect(()=>{ loadPayments(); }, []);
+  useEffect(()=>{ loadPayments(); }, [project?.id]);
 
   // Filter & search
   const filtered = useMemo(()=>{
@@ -183,9 +185,7 @@ export default function AccountsDashboard({ user }) {
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
         <div>
           <h2 style={{margin:0,fontSize:18,fontWeight:600,color:"var(--color-text-primary)"}}>Accounts — Payment Requests</h2>
-          <p style={{margin:"2px 0 0",fontSize:12,color:"var(--color-text-tertiary)"}}>
-            "Live — PaymentRequest tab" · {lastRefresh ? "Refreshed "+lastRefresh.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}) : "Loading…"}
-          </p>
+          <p style={{margin:"2px 0 0",fontSize:12,color:"var(--color-text-tertiary)"}}>{siteName ? `Site: ${siteName} · ` : ""}"Live — PaymentRequest tab" · {lastRefresh ? "Refreshed "+lastRefresh.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}) : "Loading…"}</p>
         </div>
         <button onClick={loadPayments} disabled={loading}
           style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",background:loading?"var(--color-background-secondary)":GL,border:`0.5px solid ${G}`,borderRadius:7,fontSize:12,fontWeight:500,color:G,cursor:loading?"not-allowed":"pointer"}}>

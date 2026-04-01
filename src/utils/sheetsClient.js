@@ -172,7 +172,7 @@ export async function fetchPurchaseOrders({ site="", fy="", limit=200 } = {}) {
 
 // ── Stores / Inventory reads ──────────────────────────────────────────────────
 export async function fetchStockLevels({ site="", nonZero=false } = {}) {
-  let rows = await readSheet(IDS.STORES, "StockLevels");
+  let rows = await readSheet(IDS.STORES, "StockLevels", { bustCache: true });
   if (site)    rows = rows.filter(r => r["Site Name"]?.toLowerCase().includes(site.toLowerCase()));
   if (nonZero) rows = rows.filter(r => parseFloat(r["Site Stock"]||0) > 0);
   return rows.map(r => ({

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard, ClipboardList, FileText, Users, HardHat,
   ChevronLeft, ChevronRight, ChevronDown, Building2,
@@ -62,7 +62,7 @@ function Sidebar({page,setPage,user,project,setProject,collapsed,setCollapsed,on
       </button>
       {pick&&<div style={{position:"absolute",top:"calc(100% - 4px)",left:8,right:8,background:"white",borderRadius:8,border:"0.5px solid rgba(0,0,0,.1)",zIndex:50,overflow:"hidden",boxShadow:"0 8px 24px rgba(0,0,0,.15)"}}>
         <p style={{margin:0,padding:"8px 12px",fontSize:10,fontWeight:600,color:"#888",textTransform:"uppercase",letterSpacing:".06em",borderBottom:"0.5px solid rgba(0,0,0,.08)"}}>Switch project</p>
-        {PROJECTS.filter(p=>user.projects.includes(p.id)).map(p=><button key={p.id} onClick={()=>{setProject(p);setPick(false)}} style={{width:"100%",background:project.id===p.id?GL:"transparent",border:"none",padding:"10px 12px",cursor:"pointer",textAlign:"left",borderBottom:"0.5px solid rgba(0,0,0,.06)"}}><p style={{margin:0,fontSize:12,fontWeight:500,color:project.id===p.id?G:"#1A1A1A"}}>{p.id}</p><p style={{margin:0,fontSize:11,color:"#888"}}>{p.name}</p></button>)}
+        {PROJECTS.filter(p=>user.projects.includes(p.id)).map(p=><button key={p.id} onClick={()=>{setProject(p);setPick(false)}} style={{width:"100%",background:project.id===p.id?GL:"transparent",border:"none",padding:"10px 12px",cursor:"pointer",textAlign:"left",borderBottom:"0.5px solid rgba(0,0,0,.06)"}}><p style={{margin:0,fontSize:12,fontWeight:500,color:project.id===p.id?G:"#1A1A1A"}}>{p.id}</p><p style={{margin:0,fontSize:11,color:"#888"}}>{p.siteName||p.name}</p></button>)}
       </div>}
     </div>
     <nav style={{flex:1,padding:"8px",display:"flex",flexDirection:"column",gap:2}}>
@@ -134,6 +134,14 @@ export default function App(){
   const [boqItems,setBoqItems]=useState(BOQ_ITEMS.map(b=>({...b,revisedQty:b.woQty,isRevised:false})));
   const [scBills,setScBills]=useState([]);
 
+  // When project switches — reset all project-specific state
+  useEffect(()=>{
+    setDprs([]);
+    setBills(MOCK_BILLS.filter(b=>b.billRef?.includes(project.id)||true)); // in future filter by project
+    setBoqItems(BOQ_ITEMS.map(b=>({...b,revisedQty:b.woQty,isRevised:false})));
+    setScBills([]);
+  },[project.id]);
+
   if(!isAuthenticated) return <LoginPage onLogin={login}/>;
 
   const allowed=NAV_ITEMS[user.role]||[];
@@ -150,9 +158,9 @@ export default function App(){
         {page==="bills"&&<RABills project={project} bills={bills} setBills={setBills} dprs={dprs} exportBill={b=>exportRABillPDF(b,project,BOQ_ITEMS)}/>}
         {page==="boq"&&<BOQManager project={project} boqItems={boqItems} setBoqItems={setBoqItems} raBills={bills}/>}
         {page==="subcon"&&<Subcontractors project={project} scBills={scBills} setScBills={setScBills}/>}
-        {page==="accounts"&&<AccountsDashboard user={user}/>}
-        {page==="purchase"&&<PurchaseModule user={user}/>}
-        {page==="inventory"&&<InventoryView user={user}/>}
+        {page==="accounts"&&<AccountsDashboard project={project} user={user}/>}
+        {page==="purchase"&&<PurchaseModule project={project} user={user}/>}
+        {page==="inventory"&&<InventoryView project={project} user={user}/>}
         {!PAGES_NO_SOON.includes(page)&&<div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:300,color:"var(--color-text-tertiary)"}}><Layers size={32} style={{marginBottom:8,opacity:.3}}/><p style={{fontSize:14,margin:0}}>Coming soon</p></div>}
       </div>
     </div>

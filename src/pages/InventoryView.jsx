@@ -25,7 +25,8 @@ function getPartType(code) {
 
 // ── Mock stock data (subset) ──────────────────────────────────────────────────
 
-export default function InventoryView({ user }) {
+export default function InventoryView({ project, user }) {
+  const siteName = project?.siteName || project?.site || "";
   const [stock, setStock]     = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState("");
@@ -41,13 +42,13 @@ export default function InventoryView({ user }) {
     setLoading(true); setError("");
     try {
       const { fetchStockLevels } = await import("../utils/sheetsClient");
-      const rows = await fetchStockLevels();
+      const rows = await fetchStockLevels({ site: siteName });
       setStock(rows);
       setLastRefresh(new Date());
     } catch(e) { setError(e.message); }
     finally { setLoading(false); }
   }
-  useEffect(()=>{ load(); },[]);
+  useEffect(()=>{ load(); },[project?.id]);
 
   const allSites = useMemo(()=>[...new Set(stock.map(r=>r["Site Name"]).filter(Boolean))].sort(),[stock]);
   const allTypes = useMemo(()=>[...new Set(stock.map(r=>r.partType).filter(Boolean))].sort(),[stock]);
@@ -92,7 +93,7 @@ export default function InventoryView({ user }) {
         <div>
           <h2 style={{margin:0,fontSize:18,fontWeight:600,color:"var(--color-text-primary)"}}>Inventory</h2>
           <p style={{margin:"2px 0 0",fontSize:12,color:"var(--color-text-tertiary)"}}>
-            v2_Stores → StockLevels · "Live" · {lastRefresh?"Updated "+lastRefresh.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}):""}
+            v2_Stores → StockLevels · {siteName || "All Sites"} · {lastRefresh?"Updated "+lastRefresh.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"}):""}
           </p>
         </div>
         <div style={{display:"flex",gap:8}}>

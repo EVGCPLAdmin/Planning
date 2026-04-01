@@ -25,7 +25,8 @@ const PO_STATUS = {
   "Paid":      { bg:"#E8F5E9", color:"#2E7D32"  },
 };
 
-export default function PurchaseModule({ user }) {
+export default function PurchaseModule({ project, user }) {
+  const siteName = project?.siteName || project?.site || "";
   const [activeStep, setActiveStep] = useState("mrs");
   const [mrs, setMrs]   = useState([]);
   const [pos, setPOs]   = useState([]);
@@ -44,14 +45,14 @@ export default function PurchaseModule({ user }) {
     try {
       const sc = await import("../utils/sheetsClient");
       const [mrsRows, poRows] = await Promise.all([
-        sc.fetchMRS({ fy: CURRENT_FY, limit: 500 }),
-        sc.fetchPurchaseOrders({ fy: CURRENT_FY, limit: 200 }),
+        sc.fetchMRS({ site: siteName, fy: CURRENT_FY, limit: 500 }),
+        sc.fetchPurchaseOrders({ site: siteName, fy: CURRENT_FY, limit: 200 }),
       ]);
       setMrs(mrsRows); setPOs(poRows);
     } catch(e) { setError(e.message); }
     finally { setLoading(false); }
   }
-  useEffect(()=>{ load(); },[]);
+  useEffect(()=>{ load(); },[project?.id]);
 
   const allSites = useMemo(()=>[...new Set([...mrs,...pos].map(r=>r["Site Name"]||r["Requested For"]).filter(Boolean))].sort(),[mrs,pos]);
 
@@ -99,7 +100,7 @@ export default function PurchaseModule({ user }) {
         <div>
           <h2 style={{margin:0,fontSize:18,fontWeight:600,color:"var(--color-text-primary)"}}>Purchase Module</h2>
           <p style={{margin:"2px 0 0",fontSize:12,color:"var(--color-text-tertiary)"}}>
-            MRS → PO → GRN → StockIN · FY {CURRENT_FY} · Live
+            MRS → PO → GRN → StockIN · FY {CURRENT_FY} · {siteName || "All Sites"}
           </p>
         </div>
         <button onClick={load} disabled={loading} style={{display:"flex",alignItems:"center",gap:6,padding:"7px 14px",background:GL,border:`0.5px solid ${G}`,borderRadius:7,fontSize:12,fontWeight:500,color:G,cursor:loading?"not-allowed":"pointer"}}>
