@@ -4,7 +4,7 @@ import {
   CheckCircle2, AlertCircle, CreditCard, FileText,
   Building, Phone, IndianRupee, BarChart3, AlertTriangle
 } from "lucide-react";
-import { SC_MASTER, SC_BILLS } from "../data/mockData";
+import { SC_MASTER } from "../data/mockData";
 
 const G = "#2E6B2E", GD = "#1A3F1A", GL = "#EBF5EB";
 const fmt  = n => "₹" + Math.round(n || 0).toLocaleString("en-IN");

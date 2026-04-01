@@ -156,15 +156,14 @@ export default function AccountsDashboard({ user }) {
 
   async function handleReject(row) {
     try {
-        const proxyUrl = import.meta.env.VITE_SHEETS_PROXY_URL;
-        if (proxyUrl) await fetch(proxyUrl,{
-          method:"POST",headers:{"Content-Type":"text/plain"},
-          body:JSON.stringify({ secret:import.meta.env.VITE_SHEETS_PROXY_SECRET,
-            action:"rejectPayment", spreadsheetId:"1mLddxLRf719EaXE9XSET9gT8l0a8Cxns362yIbHo63g",
-            tabName:"PaymentRequest", data:{uuid:row.UUID,remarks:rejectRemark,changedBy:user?.empRef||""}})
-        });
-      } catch(e) { showToast("Write failed: "+e.message,"error"); }
-    }
+      const proxyUrl = import.meta.env.VITE_SHEETS_PROXY_URL;
+      if (proxyUrl) await fetch(proxyUrl, {
+        method:"POST", headers:{"Content-Type":"text/plain"},
+        body:JSON.stringify({ secret:import.meta.env.VITE_SHEETS_PROXY_SECRET,
+          action:"rejectPayment", spreadsheetId:"1mLddxLRf719EaXE9XSET9gT8l0a8Cxns362yIbHo63g",
+          tabName:"PaymentRequest", data:{uuid:row.UUID,remarks:rejectRemark,changedBy:user?.empRef||""}})
+      });
+    } catch(e) { showToast("Write failed: "+e.message,"error"); }
     setPayments(prev=>prev.map(r=>r.UUID===row.UUID
       ? {...r,"Accounts Status":"Reject Payment (Accounts)","Remarks":rejectRemark,"Status":"Request Rejected by Accounts"}
       : r));

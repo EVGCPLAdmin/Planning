@@ -8,7 +8,7 @@ import {
   IndianRupee, Package, Boxes
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { PROJECTS, BOQ_ITEMS, MONTHLY_DATA, PROJECT_SITE_MAP } from "./data/mockData";
+import { PROJECTS, BOQ_ITEMS, MONTHLY_DATA, PROJECT_SITE_MAP, SUBCONTRACTORS } from "./data/mockData";
 import LoginPage, { useAuth } from "./pages/Login.jsx";
 import BOQManager from "./pages/BOQManager.jsx";
 import DPREntry from "./pages/DPREntry.jsx";
