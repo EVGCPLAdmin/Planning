@@ -100,71 +100,57 @@ export const BOQ_ITEMS = [
 
 // ── CLIENT RA BILLS ───────────────────────────────────────────────────────────
 // Source: RA_Bill_-_0N_Client_Bill.xlsx → Proforma Inv sheet, "Bill Gross Value" row (col[2] = THIS bill)
+// lines quantities from measurement sheets (Drilling + TAM + Sheath cement)
 export const MOCK_BILLS = [
   {
-    no:           1,
-    billRef:      "EG-2337/RA/001",
-    period:       "26-Jan-2025 to 25-Mar-2025",
-    date:         "22-Apr-2025",
-    grossAmt:     1540596,
-    igst:         277307,
-    netPayable:   1817903,
-    status:       "Paid",
-    certifiedAmt: 1540596,
-    paidAmt:      1540596,
-    // BOQ: 1000.2=345 RMT, 1000.5=101,331 kg
+    no: 1, billRef: "EG-2337/RA/001",
+    period: "26-Jan-2025 to 25-Mar-2025", fromDate: "2025-01-26", toDate: "2025-03-25",
+    date: "22-Apr-2025", grossAmt: 1540596, igst: 277307, netPayable: 1817903,
+    status: "Paid", certifiedAmt: 1540596, paidAmt: 1540596,
+    lines: [
+      { boqCode:"1000.2", prevQty:0,      thisQty:345,    cumQty:345,    rate:2700, thisAmt:931500  },
+      { boqCode:"1000.5", prevQty:0,      thisQty:101331, cumQty:101331, rate:6,    thisAmt:607986  },
+    ],
   },
   {
-    no:           2,
-    billRef:      "EG-2337/RA/002",
-    period:       "26-Mar-2025 to 25-May-2025",
-    date:         "18-Jun-2025",
-    grossAmt:     5814352,
-    igst:         1046583,
-    netPayable:   6860935,
-    status:       "Paid",
-    certifiedAmt: 5814352,
-    paidAmt:      5814352,
-    // BOQ: 1000.2=1380 RMT, 1000.5=344,606 kg
+    no: 2, billRef: "EG-2337/RA/002",
+    period: "26-Mar-2025 to 25-May-2025", fromDate: "2025-03-26", toDate: "2025-05-25",
+    date: "18-Jun-2025", grossAmt: 5814352, igst: 1046583, netPayable: 6860935,
+    status: "Paid", certifiedAmt: 5814352, paidAmt: 5814352,
+    lines: [
+      { boqCode:"1000.2", prevQty:345,    thisQty:1380,   cumQty:1725,   rate:2700, thisAmt:3726000  },
+      { boqCode:"1000.5", prevQty:101331, thisQty:344606, cumQty:445937, rate:6,    thisAmt:2067636  },
+    ],
   },
   {
-    no:           3,
-    billRef:      "EG-2337/RA/003",
-    period:       "26-May-2025 to 31-Jul-2025",
-    date:         "15-Aug-2025",
-    grossAmt:     2255743,
-    igst:         406034,
-    netPayable:   2661777,
-    status:       "Paid",
-    certifiedAmt: 2255743,
-    paidAmt:      2255743,
-    // BOQ: 1000.2=600 RMT, 1000.5=105,000 kg
+    no: 3, billRef: "EG-2337/RA/003",
+    period: "26-May-2025 to 31-Jul-2025", fromDate: "2025-05-26", toDate: "2025-07-31",
+    date: "15-Aug-2025", grossAmt: 2255743, igst: 406034, netPayable: 2661777,
+    status: "Paid", certifiedAmt: 2255743, paidAmt: 2255743,
+    lines: [
+      { boqCode:"1000.2", prevQty:1725,   thisQty:600,    cumQty:2325,   rate:2700, thisAmt:1620000  },
+      { boqCode:"1000.5", prevQty:445937, thisQty:105000, cumQty:550937, rate:6,    thisAmt:630000   },
+    ],
   },
   {
-    no:           4,
-    billRef:      "EG-2337/RA/004",
-    period:       "01-Aug-2025 to 31-Oct-2025",
-    date:         "15-Nov-2025",
-    grossAmt:     6717618,
-    igst:         1209171,
-    netPayable:   7926789,
-    status:       "Certified",
-    certifiedAmt: 6717618,
-    paidAmt:      0,
-    // BOQ: 1000.2=1785 RMT, 1000.5=313,500 kg
+    no: 4, billRef: "EG-2337/RA/004",
+    period: "01-Aug-2025 to 31-Oct-2025", fromDate: "2025-08-01", toDate: "2025-10-31",
+    date: "15-Nov-2025", grossAmt: 6717618, igst: 1209171, netPayable: 7926789,
+    status: "Certified", certifiedAmt: 6717618, paidAmt: 0,
+    lines: [
+      { boqCode:"1000.2", prevQty:2325,   thisQty:1785,   cumQty:4110,   rate:2700, thisAmt:4819500  },
+      { boqCode:"1000.5", prevQty:550937, thisQty:313500, cumQty:864437, rate:6,    thisAmt:1881000  },
+    ],
   },
   {
-    no:           5,
-    billRef:      "EG-2337/RA/005",
-    period:       "01-Nov-2025 to 28-Feb-2026",
-    date:         "20-Mar-2026",
-    grossAmt:     12081293,
-    igst:         2174633,
-    netPayable:   14255926,
-    status:       "Submitted",
-    certifiedAmt: 0,
-    paidAmt:      0,
-    // BOQ: 1000.2=2790 RMT, 1000.5=751,975 kg
+    no: 5, billRef: "EG-2337/RA/005",
+    period: "01-Nov-2025 to 28-Feb-2026", fromDate: "2025-11-01", toDate: "2026-02-28",
+    date: "20-Mar-2026", grossAmt: 12081293, igst: 2174633, netPayable: 14255926,
+    status: "Submitted", certifiedAmt: 0, paidAmt: 0,
+    lines: [
+      { boqCode:"1000.2", prevQty:4110,   thisQty:2790,   cumQty:6900,    rate:2700, thisAmt:7533000   },
+      { boqCode:"1000.5", prevQty:864437, thisQty:751975, cumQty:1616412, rate:6,    thisAmt:4511850   },
+    ],
   },
 ];
 
