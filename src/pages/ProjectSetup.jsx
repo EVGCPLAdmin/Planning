@@ -289,7 +289,8 @@ export default function ProjectSetup({ projects, setProjects, onProjectSelect })
                 {[
                   [Building2, "Client",    proj.client],
                   [FileText,  "WO No.",    proj.workOrder],
-                  [MapPin,    "Site",      proj.siteName || proj.site],
+                  [MapPin,    "Site Name", proj.siteName],
+                  [MapPin,    "Address",   proj.site],
                   [IndianRupee,"Contract", fmtCr(proj.contractAmt)],
                   [Calendar,  "Start",     proj.startDate],
                   [Calendar,  "End",       proj.endDate],
@@ -469,17 +470,40 @@ export default function ProjectSetup({ projects, setProjects, onProjectSelect })
           </Section>
 
           <Section title="Site Details" icon={MapPin} defaultOpen>
+            {/* Site Name — KEY FIELD — shown first and highlighted */}
+            <div style={{ background:"#E8F5E9", border:"1.5px solid #2E6B2E", borderRadius:10, padding:"14px 16px", marginBottom:16 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
+                <MapPin size={15} color="#2E6B2E"/>
+                <span style={{ fontWeight:700, fontSize:14, color:"#1A3F1A" }}>Site Name</span>
+                <span style={{ background:"#C62828", color:"white", fontSize:10, fontWeight:600, padding:"1px 7px", borderRadius:20 }}>REQUIRED · KEY FIELD</span>
+              </div>
+              <p style={{ margin:"0 0 10px", fontSize:12, color:"#2E6B2E", lineHeight:1.5 }}>
+                This name is the <strong>data filter key</strong> — it must exactly match the "Site Name" value in your Google Sheets.
+                All these modules filter data using this value:
+              </p>
+              <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:12 }}>
+                {["DPR Entry","Accounts","Purchase","Inventory","RA Bills","Employees","Equipment"].map(m=>(
+                  <span key={m} style={{ background:"white", border:"0.5px solid #2E6B2E", color:"#1A3F1A", fontSize:11, fontWeight:500, padding:"2px 10px", borderRadius:20 }}>{m}</span>
+                ))}
+              </div>
+              <input value={form.siteName}
+                onChange={e => setForm({...form, siteName:e.target.value.toUpperCase()})}
+                placeholder="LNT - SIKKIM"
+                style={{ ...inp(errors.siteName), fontSize:15, fontWeight:600, letterSpacing:".03em", border:`1.5px solid ${errors.siteName?"#E53935":"#2E6B2E"}`, background:"white" }}/>
+              {errors.siteName
+                ? <p style={{margin:"4px 0 0",fontSize:11,color:"#E53935"}}>{errors.siteName}</p>
+                : <p style={{margin:"4px 0 0",fontSize:11,color:"#2E6B2E"}}>
+                    Must match exactly: EmployeeRegister → Site Name column · StockLevels → Site Name column · PaymentRequest → Site Name column
+                  </p>
+              }
+            </div>
+
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
               <F label="Site Address" required col="span 2">
                 <input value={form.site} onChange={e => setForm({...form, site:e.target.value})}
                   placeholder="Dam Site Adit 2, Chungthang, Sikkim – 737120"
                   style={inp(errors.site)}/>
                 {errors.site && <p style={{margin:"3px 0 0",fontSize:11,color:"#E53935"}}>{errors.site}</p>}
-              </F>
-              <F label="Site Name" required hint="Used for filtering data (e.g. LNT - SIKKIM)">
-                <input value={form.siteName} onChange={e => setForm({...form, siteName:e.target.value})}
-                  placeholder="LNT - SIKKIM" style={inp(errors.siteName)}/>
-                {errors.siteName && <p style={{margin:"3px 0 0",fontSize:11,color:"#E53935"}}>{errors.siteName}</p>}
               </F>
               <F label="Payroll Entity">
                 <input value={form.payroll} onChange={e => setForm({...form, payroll:e.target.value})}

@@ -244,7 +244,7 @@ export default function RABills({ project, bills, setBills, dprs, exportBill }) 
             {[
               ["Period", viewBill.period],
               ["Work Order", project.workOrder],
-              ["Site", project.site],
+              ["Site", project.siteName || project.site],
             ].map(([k,v]) => (
               <div key={k}>
                 <p style={{ margin:"0 0 2px", fontSize:11, color:"var(--color-text-tertiary)", fontWeight:500, textTransform:"uppercase" }}>{k}</p>

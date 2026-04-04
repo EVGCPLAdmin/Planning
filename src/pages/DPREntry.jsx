@@ -287,8 +287,9 @@ const StatusBadge = ({status}) => {
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
 export default function DPREntry({ project, dprs, setDprs, exportDPR, user }) {
-  // Derive site from project
-  const siteName = PROJECT_SITE_MAP[project.id] || "";
+  // Derive site from project — project.siteName is the canonical filter key
+  // Falls back to PROJECT_SITE_MAP for legacy projects not created via Project Setup
+  const siteName = project.siteName || PROJECT_SITE_MAP[project.id] || "";
 
   // Live data loading
   const [liveData, setLiveData] = useState({ personnel:[], equipment:[], scMaster:[] });
