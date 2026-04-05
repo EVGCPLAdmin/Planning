@@ -15,6 +15,7 @@ const IDS = {
   MASTER:    import.meta.env.VITE_SHEET_MASTER    || "1B2wb38KhNwlLoZnsAGWQkO0FdEGFFfsh3ycRRurigq4",
   PURCHASE:  import.meta.env.VITE_SHEET_PURCHASE  || "1zcqF2tjjBETPuW25c9MBMo0zakBIBD6tksg5OstFA7c",
   STORES:    import.meta.env.VITE_SHEET_STORES    || "1iMQxgqGilUh2_3NCZl5D-EMt-NC8FwugX83q2fWb8fE",
+  PROJECTS:  import.meta.env.VITE_SHEET_PROJECTS  || "1dQow9nD4e0qVOSfpwEWQmPTuhF3FW_8r1oK5dMjJlRE",
 };
 
 // Simple in-memory cache — avoids re-fetching same tab within a session
@@ -235,3 +236,176 @@ export default {
   markPaymentPaid, rejectPayment, updateRow,
   parseEmpRef, parseVendorRef, fmtLakhs, generateId, getCurrentFY, clearCache,
 };
+
+// ── ProjectSetup_v1 — Project tab ──────────────────────────────────────────
+// Sheet: 1dQow9nD4e0qVOSfpwEWQmPTuhF3FW_8r1oK5dMjJlRE | Tab: Project
+// 45 columns: UUID|Company|Awarded Date|Private/Govt|Series|Project Code|
+// Project Name|Client Name|Work Order Number|WO Date|Contract Amount|
+// PAN|TAN|GST|Site Name|Site Address Line 1|Site Address Line 2|
+// Site Address Line 3|Address|City|State|Country|Pin Code|
+// Purchase Billing Under|Payroll Under|Email ID|Contact 1|Contact 2|Contact 3|
+// WebSite|Location|Delivery Address|Start Date|End Date|
+// Site In Charge Name|Reporting Manager Name|Planning In-Charge|Mess In-Charge|
+// Accounts In-Charge|Attendance In-Charge|SC Attendance In-Charge|
+// UserEmail|SystemEmail|Timestamp|Active/Inactive?
+
+export async function fetchProjectsFromSheet() {
+  const rows = await readSheet(IDS.PROJECTS, "Project", { bustCache: true });
+  return rows.filter(r => (r["Active/Inactive?"] || "").toUpperCase() === "ACTIVE");
+}
+
+export function mapSheetRowToProject(row) {
+  // Map the 45-column sheet schema to the app's project object
+  const addr = [row["Site Address Line 1"], row["Site Address Line 2"], row["Site Address Line 3"]]
+    .filter(Boolean).join(", ");
+  return {
+    uuid:              row["UUID"]                  || "",
+    id:                row["Project Code"]          || "",
+    company:           row["Company"]               || "",
+    awardedDate:       row["Awarded Date"]          || "",
+    projectType:       row["Private / Govt"]        || "Private",
+    series:            row["Series"]                || "",
+    name:              row["Project Name"]          || "",
+    client:            row["Client Name"]           || "",
+    workOrder:         row["Work Order Number"]     || "",
+    woDate:            row["WO Date"]               || "",
+    contractAmt:       parseFloat(row["Contract Amount"] || 0),
+    pan:               row["PAN"]                   || "",
+    tan:               row["TAN"]                   || "",
+    gst:               row["GST"]                   || "",
+    siteName:          row["Site Name"]             || "",        // KEY FILTER FIELD
+    siteAddr1:         row["Site Address Line 1"]   || "",
+    siteAddr2:         row["Site Address Line 2"]   || "",
+    siteAddr3:         row["Site Address Line 3"]   || "",
+    site:              row["Address"]               || addr,      // full address
+    city:              row["City"]                  || "",
+    state:             row["State"]                 || "",
+    country:           row["Country"]               || "India",
+    pinCode:           row["Pin Code"]              || "",
+    purchaseBilling:   row["Purchase Billing Under"]|| "",
+    payroll:           row["Payroll Under"]         || "",
+    email:             row["Email ID"]              || "",
+    contact1:          row["Contact 1"]             || "",
+    contact2:          row["Contact 2"]             || "",
+    contact3:          row["Contact 3"]             || "",
+    website:           row["WebSite"]               || "",
+    location:          row["Location"]              || "",
+    deliveryAddress:   row["Delivery Address"]      || "",
+    startDate:         row["Start Date"]            || "",
+    endDate:           row["End Date"]              || "",
+    siteInCharge:      row["Site In Charge Name"]   || "",
+    reportingManager:  row["Reporting Manager Name"]|| "",
+    planningInCharge:  row["Planning In-Charge"]    || "",
+    messInCharge:      row["Mess In-Charge"]        || "",
+    accountsInCharge:  row["Accounts In-Charge"]    || "",
+    attendanceInCharge:row["Attendance In-Charge"]  || "",
+    scAttendance:      row["SC Attendance In-Charge"]|| "",
+    userEmail:         row["UserEmail"]             || "",
+    systemEmail:       row["SystemEmail"]           || "",
+    status:            row["Active/Inactive?"]      || "ACTIVE",
+    projects:          ["*"],                                     // admin sees all by default
+  };
+}
+
+export function buildProjectRow(proj, userEmail = "") {
+  // Build a 45-element array matching the exact column order of the Project tab
+  const now = new Date().toLocaleString("en-IN", { timeZone:"Asia/Kolkata" });
+  const fullAddr = [proj.siteAddr1, proj.siteAddr2, proj.siteAddr3, proj.city, proj.state]
+    .filter(Boolean).join(", ") + (proj.pinCode ? `-${proj.pinCode}` : "");
+  const uuid = proj.uuid || "EGA-" + Math.random().toString(16).slice(2,10);
+  return [
+    uuid,                        // A: UUID
+    proj.company || "",          // B: Company
+    proj.awardedDate || "",      // C: Awarded Date
+    proj.projectType || "Private",// D: Private / Govt
+    proj.series || "",           // E: Series
+    proj.id || "",               // F: Project Code
+    proj.name || "",             // G: Project Name
+    proj.client || "",           // H: Client Name
+    proj.workOrder || "",        // I: Work Order Number
+    proj.woDate || "",           // J: WO Date
+    proj.contractAmt || "",      // K: Contract Amount
+    proj.pan || "",              // L: PAN
+    proj.tan || "",              // M: TAN
+    proj.gst || "",              // N: GST
+    proj.siteName || "",         // O: Site Name (KEY FIELD)
+    proj.siteAddr1 || "",        // P: Site Address Line 1
+    proj.siteAddr2 || "",        // Q: Site Address Line 2
+    proj.siteAddr3 || "",        // R: Site Address Line 3
+    fullAddr,                    // S: Address (full combined)
+    proj.city || "",             // T: City
+    proj.state || "",            // U: State
+    proj.country || "India",     // V: Country
+    proj.pinCode || "",          // W: Pin Code
+    proj.purchaseBilling || "",  // X: Purchase Billing Under
+    proj.payroll || "",          // Y: Payroll Under
+    proj.email || userEmail,     // Z: Email ID
+    proj.contact1 || "",         // AA: Contact 1
+    proj.contact2 || "",         // AB: Contact 2
+    proj.contact3 || "",         // AC: Contact 3
+    proj.website || "",          // AD: WebSite
+    proj.location || "",         // AE: Location
+    proj.deliveryAddress || "",  // AF: Delivery Address
+    proj.startDate || "",        // AG: Start Date
+    proj.endDate || "",          // AH: End Date
+    proj.siteInCharge || "",     // AI: Site In Charge Name
+    proj.reportingManager || "", // AJ: Reporting Manager Name
+    proj.planningInCharge || "", // AK: Planning In-Charge
+    proj.messInCharge || "",     // AL: Mess In-Charge
+    proj.accountsInCharge || "", // AM: Accounts In-Charge
+    proj.attendanceInCharge || "",// AN: Attendance In-Charge
+    proj.scAttendance || "",     // AO: SC Attendance In-Charge
+    userEmail,                   // AP: UserEmail
+    userEmail,                   // AQ: SystemEmail
+    now,                         // AR: Timestamp
+    proj.status || "ACTIVE",     // AS: Active/Inactive?
+  ];
+}
+
+export async function saveProjectToSheet(proj, userEmail = "") {
+  clearCache();
+  const row = buildProjectRow(proj, userEmail);
+  return proxyPost({
+    action: "append",
+    spreadsheetId: IDS.PROJECTS,
+    tabName: "Project",
+    data: { row },
+  });
+}
+
+export async function updateProjectInSheet(proj, userEmail = "") {
+  clearCache();
+  const row = buildProjectRow(proj, userEmail);
+  return proxyPost({
+    action: "update",
+    spreadsheetId: IDS.PROJECTS,
+    tabName: "Project",
+    data: {
+      uuid: proj.uuid,
+      fields: {
+        "Project Name":           proj.name,
+        "Client Name":            proj.client,
+        "Work Order Number":      proj.workOrder,
+        "WO Date":                proj.woDate,
+        "Contract Amount":        proj.contractAmt,
+        "GST":                    proj.gst,
+        "Site Name":              proj.siteName,
+        "Site Address Line 1":    proj.siteAddr1,
+        "Site Address Line 2":    proj.siteAddr2,
+        "Site Address Line 3":    proj.siteAddr3,
+        "City":                   proj.city,
+        "State":                  proj.state,
+        "Pin Code":               proj.pinCode,
+        "Start Date":             proj.startDate,
+        "End Date":               proj.endDate,
+        "Purchase Billing Under": proj.purchaseBilling,
+        "Payroll Under":          proj.payroll,
+        "Contact 1":              proj.contact1,
+        "Contact 2":              proj.contact2,
+        "Site In Charge Name":    proj.siteInCharge,
+        "Reporting Manager Name": proj.reportingManager,
+        "Active/Inactive?":       proj.status,
+      }
+    }
+  });
+}

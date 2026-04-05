@@ -34,6 +34,7 @@ jobs:
           VITE_SHEET_MASTER:         ${{ secrets.VITE_SHEET_MASTER }}
           VITE_SHEET_PURCHASE:       ${{ secrets.VITE_SHEET_PURCHASE }}
           VITE_SHEET_STORES:         ${{ secrets.VITE_SHEET_STORES }}
+          VITE_SHEET_PROJECTS:       ${{ secrets.VITE_SHEET_PROJECTS }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
